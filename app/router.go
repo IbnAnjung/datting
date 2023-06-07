@@ -10,7 +10,7 @@ import (
 )
 
 func LoadGinRouter(
-	auth auth_entity.Auth,
+	auth auth_entity.AuthUseCase,
 	jwt auth_entity.Jwt,
 ) *gin.Engine {
 	router := gin.Default()

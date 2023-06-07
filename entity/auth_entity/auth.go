@@ -7,7 +7,7 @@ type Jwt interface {
 	ParseToken(tokenString string) (claims interface{}, err error)
 }
 
-type Auth interface {
+type AuthUseCase interface {
 	Register(ctx context.Context, input RegisterInput) (output RegisterOutput, err error)
 	Login(ctx context.Context, input LoginInput) (output LoginOutput, err error)
 }

@@ -12,12 +12,12 @@ import (
 )
 
 type AuthHandler struct {
-	authUC auth_entity.Auth
+	authUC auth_entity.AuthUseCase
 	jwt    auth_entity.Jwt
 }
 
 func NewAuthHandler(
-	authUC auth_entity.Auth,
+	authUC auth_entity.AuthUseCase,
 	jwt auth_entity.Jwt,
 ) AuthHandler {
 	return AuthHandler{
