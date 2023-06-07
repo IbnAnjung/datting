@@ -20,7 +20,8 @@ func (u AuthUC) Register(ctx context.Context, input auth_entity.RegisterInput) (
 	}
 
 	if user.ID != 0 {
-		err = utils.DuplicatedDataError{}
+		utils.DuplicatedDataError.Message = "username already Exists"
+		err = utils.DuplicatedDataError
 		return
 	}
 

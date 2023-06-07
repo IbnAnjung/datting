@@ -49,7 +49,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 			return
 		}
 
-		if err, ok := err.(utils.DuplicatedDataError); ok {
+		if err, ok := err.(utils.ClientError); ok {
 			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -66,10 +66,8 @@ func (h AuthHandler) Register(c *gin.Context) {
 	})
 
 	if err != nil {
-		if err, ok := err.(utils.DuplicatedDataError); ok {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
+		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	utils.SuccessResponse(c, http.StatusCreated, "Success Register new User", response.RegisterResponse{
