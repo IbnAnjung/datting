@@ -5,8 +5,3 @@ type UserJwtClaims struct {
 	Username      string `json:"username"`
 	IsPremiumUser bool   `json:"is_premium_user"`
 }
-
-type Jwt interface {
-	GenerateToken(claims interface{}) (token string, err error)
-	ParseToken(tokenString string) (claims interface{}, err error)
-}

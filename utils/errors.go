@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"net/http"
+
 	"github.com/IbnAnjung/datting/entity/validator_entity"
 )
 
@@ -19,7 +21,7 @@ func (e ClientError) ErrorCode() int {
 
 var (
 	DataNotFoundError   = ClientError{Message: "Data Not Found"}
-	DuplicatedDataError = ClientError{Message: "Data Already Exists"}
+	DuplicatedDataError = ClientError{Message: "Data Already Exists", Code: http.StatusNotFound}
 )
 
 type ValidationError struct {

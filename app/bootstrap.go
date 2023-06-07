@@ -67,6 +67,7 @@ func Start(ctx context.Context) (func(), error) {
 		userRepo,
 		validator,
 		crypt,
+		jwt,
 	)
 
 	router := LoadGinRouter(

@@ -25,6 +25,7 @@ func LoadGinRouter(
 	authH := router.Group("/auth")
 	{
 		authH.POST("/register", authHandler.Register)
+		authH.POST("/login", authHandler.Login)
 	}
 	return router
 }
