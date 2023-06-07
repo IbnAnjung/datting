@@ -5,3 +5,9 @@ type UserJwtClaims struct {
 	Username      string `json:"username"`
 	IsPremiumUser bool   `json:"is_premium_user"`
 }
+
+var (
+	JwtClaim_UserID        = "UserID"
+	JwtClaim_Username      = "Username"
+	JwtClaim_IsPremiumUser = "IsPremiumUser"
+)

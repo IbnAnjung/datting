@@ -15,7 +15,7 @@ type Jwt struct {
 
 type jwtClaims struct {
 	jwt.RegisteredClaims
-	claims interface{}
+	Claims interface{}
 }
 
 func NewJwt(
@@ -31,15 +31,12 @@ func NewJwt(
 }
 
 func (j Jwt) GenerateToken(claims interface{}) (signToken string, err error) {
-	jwtclaims := jwtClaims{
-		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(j.expireDuration) * time.Minute)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    j.issuer,
-		},
-		claims,
-	}
+	jwtclaims := jwtClaims{}
+	jwtclaims.Issuer = j.issuer
+	jwtclaims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Duration(j.expireDuration) * time.Minute))
+	jwtclaims.IssuedAt = jwt.NewNumericDate(time.Now())
+	jwtclaims.NotBefore = jwt.NewNumericDate(time.Now())
+	jwtclaims.Claims = claims
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtclaims)
 	signToken, err = token.SignedString([]byte(j.signKey))
@@ -53,12 +50,15 @@ func (j Jwt) ParseToken(tokenString string) (claims interface{}, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-
 		return []byte(j.signKey), nil
 	})
 
+	if err != nil {
+		return jwtClaims, err
+	}
+
 	if token.Valid {
-		return jwtClaims.claims, err
+		return jwtClaims.Claims, nil
 	}
 
 	return nil, err
