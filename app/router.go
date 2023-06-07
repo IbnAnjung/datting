@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
-	"github.com/IbnAnjung/datting/handler"
+	"github.com/IbnAnjung/datting/handler/auth_handler"
 	"github.com/IbnAnjung/datting/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +21,7 @@ func LoadGinRouter(
 	})
 
 	//auth
-	authHandler := handler.NewAuthHandler(auth, jwt)
+	authHandler := auth_handler.NewAuthHandler(auth, jwt)
 	authH := router.Group("/auth")
 	{
 		authH.POST("/register", authHandler.Register)

@@ -1,4 +1,4 @@
-package request
+package dto
 
 type RegisterRequest struct {
 	Username        string `json:"username"`
@@ -9,7 +9,11 @@ type RegisterRequest struct {
 	Gender          string `json:"gender"`
 }
 
-type LoginRequest struct {
+type RegisterResponse struct {
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	FullName string `json:"fullname"`
+	Age      int    `json:"age"`
+	Gender   string `json:"gender"`
+	JwtToken string `json:"jwt_token"`
 }
