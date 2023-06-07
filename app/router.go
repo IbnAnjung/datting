@@ -3,15 +3,27 @@ package app
 import (
 	"net/http"
 
+	"github.com/IbnAnjung/datting/entity/auth_entity"
+	"github.com/IbnAnjung/datting/handler"
 	"github.com/IbnAnjung/datting/utils"
 	"github.com/gin-gonic/gin"
 )
 
-func LoadGinRouter() *gin.Engine {
+func LoadGinRouter(
+	auth auth_entity.Auth,
+) *gin.Engine {
 	router := gin.Default()
+
+	//healt
 	router.GET("/", func(c *gin.Context) {
 		utils.SuccessResponse(c, http.StatusOK, "service is up", nil)
 	})
 
+	//auth
+	authHandler := handler.NewAuthHandler(auth)
+	authH := router.Group("/auth")
+	{
+		authH.POST("/register", authHandler.Register)
+	}
 	return router
 }

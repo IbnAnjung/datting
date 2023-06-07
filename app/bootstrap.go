@@ -5,13 +5,16 @@ import (
 	"fmt"
 
 	"github.com/IbnAnjung/datting/driver"
+	"github.com/IbnAnjung/datting/repository/mysqlgorm/user_repository"
+	authUC "github.com/IbnAnjung/datting/usecase/auth"
+	"github.com/IbnAnjung/datting/utils"
 )
 
 func Start(ctx context.Context) (func(), error) {
 
 	conf, err := LoadConfig()
 	if err != nil {
-		return func() {}, fmt.Errorf("Load config failed: %s", err.Error())
+		return func() {}, fmt.Errorf("load config failed: %s", err.Error())
 	}
 
 	mysqlConf := conf.Mysql
@@ -27,7 +30,7 @@ func Start(ctx context.Context) (func(), error) {
 		mysqlConf.MaxIddleConnection,
 	)
 
-	_, mysqlCleanup, err := driver.NewMysqlConnection(ctx, sqlConfig)
+	dbconn, mysqlCleanup, err := driver.NewMysqlConnection(ctx, sqlConfig)
 	if err != nil {
 		return func() {}, err
 	}
@@ -41,7 +44,21 @@ func Start(ctx context.Context) (func(), error) {
 		}, err
 	}
 
-	router := LoadGinRouter()
+	orm, err := utils.NewGormOrm("mysql", dbconn)
+	if err != nil {
+		return func() {
+			mysqlCleanup()
+		}, err
+	}
+
+	userRepo := user_repository.New(orm)
+	authUC := authUC.New(
+		userRepo,
+	)
+
+	router := LoadGinRouter(
+		authUC,
+	)
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))
 	if err != nil {
 		return func() {
