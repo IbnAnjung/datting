@@ -9,3 +9,10 @@ type UserModel struct {
 	Gender        string
 	IsPremiumUser bool
 }
+
+type UserRepository interface {
+	FindUserByUsername(username string) (UserModel, error)
+	CreateNewUser(*UserModel) error
+}
+
+type UserUseCase interface{}
