@@ -11,6 +11,7 @@ import (
 
 func LoadGinRouter(
 	auth auth_entity.Auth,
+	jwt auth_entity.Jwt,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -20,7 +21,7 @@ func LoadGinRouter(
 	})
 
 	//auth
-	authHandler := handler.NewAuthHandler(auth)
+	authHandler := handler.NewAuthHandler(auth, jwt)
 	authH := router.Group("/auth")
 	{
 		authH.POST("/register", authHandler.Register)

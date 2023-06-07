@@ -9,10 +9,21 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type AppConfig struct {
+	Name string
+}
+
+type JwtConfig struct {
+	SecretKey      string
+	ExpireDuration int64
+}
+
 type Config struct {
+	App   AppConfig
 	Http  HttpConfig
 	Mysql MysqlConfig
 	Redis RedisConfig
+	Jwt   JwtConfig
 }
 
 type HttpConfig struct {
@@ -61,10 +72,19 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
+	jwtConfig, err := loadJwtConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
+		App: AppConfig{
+			Name: os.Getenv("APP_NAME"),
+		},
 		Http:  httpConfig,
 		Mysql: mysqlConfig,
 		Redis: redisConfig,
+		Jwt:   jwtConfig,
 	}, nil
 }
 
@@ -142,5 +162,17 @@ func loadRedisConfig() (RedisConfig, error) {
 		User:     os.Getenv("REDIS_USER"),
 		Password: os.Getenv("REDIS_PASSWORD"),
 		Db:       db,
+	}, nil
+}
+
+func loadJwtConfig() (JwtConfig, error) {
+	expireDuration, err := strconv.ParseInt(os.Getenv("JWT_EXIPIRE_DURATION"), 10, 64)
+	if err != nil {
+		return JwtConfig{}, errors.New("invalid HTTP_PORT value")
+	}
+
+	return JwtConfig{
+		SecretKey:      os.Getenv("JWT_KEY"),
+		ExpireDuration: expireDuration,
 	}, nil
 }

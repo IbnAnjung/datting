@@ -1,5 +1,7 @@
 package utils
 
+import "github.com/IbnAnjung/datting/entity/validator_entity"
+
 type DataNotFoundError struct{}
 
 func (DataNotFoundError) Error() string {
@@ -13,7 +15,8 @@ func (DuplicatedDataError) Error() string {
 }
 
 type ValidationError struct {
-	Message string
+	Message   string
+	Validator validator_entity.Validator
 }
 
 func (e ValidationError) Error() string {

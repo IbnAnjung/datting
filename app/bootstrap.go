@@ -7,7 +7,6 @@ import (
 	"github.com/IbnAnjung/datting/driver"
 	"github.com/IbnAnjung/datting/repository/mysqlgorm/user_repository"
 	authUC "github.com/IbnAnjung/datting/usecase/auth"
-	"github.com/IbnAnjung/datting/utils"
 )
 
 func Start(ctx context.Context) (func(), error) {
@@ -44,21 +43,36 @@ func Start(ctx context.Context) (func(), error) {
 		}, err
 	}
 
-	orm, err := utils.NewGormOrm("mysql", dbconn)
+	orm, err := driver.NewGormOrm("mysql", dbconn)
+	if err != nil {
+		return func() {
+			mysqlCleanup()
+		}, err
+	}
+	// repository
+	userRepo := user_repository.New(orm)
+
+	// validator
+	validator, err := driver.NewValidator()
 	if err != nil {
 		return func() {
 			mysqlCleanup()
 		}, err
 	}
 
-	userRepo := user_repository.New(orm)
+	crypt := driver.NewBycrypt()
+	jwt := driver.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
+
 	authUC := authUC.New(
 		userRepo,
+		validator,
+		crypt,
 	)
 
 	router := LoadGinRouter(
-		authUC,
+		authUC, jwt,
 	)
+
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))
 	if err != nil {
 		return func() {
