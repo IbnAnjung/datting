@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/IbnAnjung/datting/driver"
 	"github.com/IbnAnjung/datting/entity/auth_entity"
 	"github.com/IbnAnjung/datting/utils"
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		conf, _ := LoadConfig()
 
-		jwt := driver.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
+		jwt := utils.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
 
 		auth := c.Request.Header.Get("Authorization")
 		if auth == "" {
