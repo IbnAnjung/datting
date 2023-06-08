@@ -1,7 +1,10 @@
-package user_repository
+package mysqlgorm
 
 import (
+	"errors"
+
 	"github.com/IbnAnjung/datting/entity/user_entity"
+	"github.com/IbnAnjung/datting/utils"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +22,7 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{
 		db: db,
 	}
@@ -32,6 +35,31 @@ func (r UserRepository) FindUserByUsername(username string) (user_entity.UserMod
 		Find(m).Error
 
 	if err != nil {
+		return user_entity.UserModel{}, err
+	}
+
+	return user_entity.UserModel{
+		ID:            m.ID,
+		Username:      m.Username,
+		Password:      m.Password,
+		Fullname:      m.Fullname,
+		Age:           m.Age,
+		Gender:        m.Gender,
+		IsPremiumUser: m.IsPremiumUser,
+	}, nil
+}
+
+func (r UserRepository) FindUserById(id int64) (user_entity.UserModel, error) {
+	m := &userGormModel{}
+	err := r.db.Table("users").Select("*").
+		Where("id = ?", id).
+		Find(m).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = utils.DataNotFoundError
+		}
+
 		return user_entity.UserModel{}, err
 	}
 
@@ -60,4 +88,26 @@ func (r UserRepository) CreateNewUser(entity *user_entity.UserModel) error {
 	entity.ID = m.ID
 
 	return err
+}
+
+func (r UserRepository) FindUser(gender string, excldeUserIds []int64) (user_entity.UserModel, error) {
+	m := &userGormModel{}
+	err := r.db.Table("users").Select("*").
+		Where("gender = ?", gender).
+		Not(map[string]interface{}{"id": excldeUserIds}).
+		First(m).Error
+
+	if err != nil {
+		return user_entity.UserModel{}, err
+	}
+
+	return user_entity.UserModel{
+		ID:            m.ID,
+		Username:      m.Username,
+		Password:      m.Password,
+		Fullname:      m.Fullname,
+		Age:           m.Age,
+		Gender:        m.Gender,
+		IsPremiumUser: m.IsPremiumUser,
+	}, nil
 }

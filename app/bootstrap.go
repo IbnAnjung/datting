@@ -5,8 +5,11 @@ import (
 	"fmt"
 
 	"github.com/IbnAnjung/datting/driver"
-	"github.com/IbnAnjung/datting/repository/mysqlgorm/user_repository"
+	"github.com/IbnAnjung/datting/repository/mysqlgorm"
+	"github.com/IbnAnjung/datting/repository/redis_repository"
 	authUC "github.com/IbnAnjung/datting/usecase/auth"
+	userUC "github.com/IbnAnjung/datting/usecase/user"
+	"github.com/IbnAnjung/datting/utils"
 )
 
 func Start(ctx context.Context) (func(), error) {
@@ -36,12 +39,14 @@ func Start(ctx context.Context) (func(), error) {
 
 	redisConf := conf.Redis
 	redisConfig := driver.LoadRedisConfig(redisConf.Host, redisConf.Port, redisConf.User, redisConf.Password, redisConf.Db)
-	_, redisCleanup, err := driver.NewRedisConnection(ctx, redisConfig)
+	redisConn, redisCleanup, err := driver.NewRedisConnection(ctx, redisConfig)
 	if err != nil {
 		return func() {
 			mysqlCleanup()
 		}, err
 	}
+
+	cache := utils.NewRedisCaching(redisConn)
 
 	orm, err := driver.NewGormOrm("mysql", dbconn)
 	if err != nil {
@@ -50,18 +55,19 @@ func Start(ctx context.Context) (func(), error) {
 		}, err
 	}
 	// repository
-	userRepo := user_repository.New(orm)
+	userRepo := mysqlgorm.NewUserRepository(orm)
+	userCacheRepo := redis_repository.NewUserCacheRepository(cache)
 
 	// validator
-	validator, err := driver.NewValidator()
+	validator, err := utils.NewValidator()
 	if err != nil {
 		return func() {
 			mysqlCleanup()
 		}, err
 	}
 
-	crypt := driver.NewBycrypt()
-	jwt := driver.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
+	crypt := utils.NewBycrypt()
+	jwt := utils.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
 
 	authUC := authUC.New(
 		userRepo,
@@ -70,8 +76,13 @@ func Start(ctx context.Context) (func(), error) {
 		jwt,
 	)
 
+	userUC := userUC.New(
+		userRepo,
+		userCacheRepo,
+	)
+
 	router := LoadGinRouter(
-		authUC, jwt,
+		authUC, userUC, jwt,
 	)
 
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))
