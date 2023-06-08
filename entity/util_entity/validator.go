@@ -1,4 +1,4 @@
-package validator_entity
+package util_entity
 
 type Validator interface {
 	ValidateStruct(input interface{}) error
