@@ -23,6 +23,7 @@ func (UserGormModel) TableName() string {
 }
 
 func (m *UserGormModel) set(entity user_entity.UserModel) {
+	m.ID = entity.ID
 	m.Username = entity.Username
 	m.Password = entity.Password
 	m.Fullname = entity.Fullname
@@ -130,7 +131,10 @@ func (r UserRepository) UpdateUser(entity *user_entity.UserModel) error {
 	m := &UserGormModel{}
 	m.set(*entity)
 
-	return r.db.Model(m).Updates(m).Error
+	return r.db.Model(m).
+		Select("Username", "Password", "Fullname", "Age", "Gender", "IsPremiumUser").
+		Where("id", m.ID).
+		Updates(m).Error
 }
 
 func (r UserRepository) FindUser(gender string, excldeUserIds []int64) (user_entity.UserModel, error) {

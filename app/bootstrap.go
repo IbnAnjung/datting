@@ -7,6 +7,7 @@ import (
 	"github.com/IbnAnjung/datting/driver"
 	"github.com/IbnAnjung/datting/repository/mysqlgorm"
 	"github.com/IbnAnjung/datting/repository/redis_repository"
+	accountUC "github.com/IbnAnjung/datting/usecase/account"
 	authUC "github.com/IbnAnjung/datting/usecase/auth"
 	userUC "github.com/IbnAnjung/datting/usecase/user"
 	userSwapUC "github.com/IbnAnjung/datting/usecase/user_swap"
@@ -71,28 +72,14 @@ func Start(ctx context.Context) (func(), error) {
 	crypt := utils.NewBycrypt()
 	jwt := utils.NewJwt(conf.App.Name, conf.Jwt.SecretKey, conf.Jwt.ExpireDuration)
 
-	authUC := authUC.New(
-		userRepo,
-		validator,
-		crypt,
-		jwt,
-	)
-
-	userUC := userUC.New(
-		validator,
-		userRepo,
-		userCacheRepo,
-	)
-
-	userSwapUC := userSwapUC.New(
-		validator,
-		userRepo,
-		userCacheRepo,
-		userSwapRepo,
-	)
+	// usecase
+	authUC := authUC.New(userRepo, validator, crypt, jwt)
+	userUC := userUC.New(validator, userRepo, userCacheRepo)
+	userSwapUC := userSwapUC.New(validator, userRepo, userCacheRepo, userSwapRepo)
+	accountUC := accountUC.New(userRepo)
 
 	router := LoadGinRouter(
-		authUC, userUC, userSwapUC, jwt,
+		authUC, userUC, userSwapUC, accountUC, jwt,
 	)
 
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))
