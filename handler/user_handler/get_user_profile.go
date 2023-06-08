@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h UserHandler) GerUserProfile(c *gin.Context) {
+func (h UserHandler) GetUserProfile(c *gin.Context) {
 	id, ok := c.Get(auth_entity.JwtClaim_UserID)
 	if !ok {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "invalid token")

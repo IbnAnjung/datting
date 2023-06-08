@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 
+	"github.com/IbnAnjung/datting/entity/user_swap_entity"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -19,6 +20,17 @@ func NewValidator() (Validator, error) {
 
 		switch value {
 		case "L", "P":
+			return true
+		}
+
+		return false
+	})
+
+	v.RegisterValidation("swap_type", func(fl validator.FieldLevel) bool {
+		value := fl.Field().String()
+
+		switch value {
+		case string(user_swap_entity.SwapToLike), string(user_swap_entity.SwapToPass):
 			return true
 		}
 

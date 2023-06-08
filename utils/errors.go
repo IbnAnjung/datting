@@ -24,8 +24,9 @@ func (e ClientError) ErrorCode() int {
 }
 
 var (
-	DataNotFoundError   = ClientError{Message: "Data Not Found", Code: http.StatusNotFound}
-	DuplicatedDataError = ClientError{Message: "Data Already Exists", Code: http.StatusBadRequest}
+	DataNotFoundError        = ClientError{Message: "Data Not Found", Code: http.StatusNotFound}
+	DuplicatedDataError      = ClientError{Message: "Data Already Exists", Code: http.StatusBadRequest}
+	UnprocessableEntityError = ClientError{Message: "Unprocessable", Code: http.StatusUnprocessableEntity}
 )
 
 type ValidationError struct {

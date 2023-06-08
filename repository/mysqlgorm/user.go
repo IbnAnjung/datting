@@ -74,6 +74,35 @@ func (r UserRepository) FindUserById(id int64) (user_entity.UserModel, error) {
 	}, nil
 }
 
+func (r UserRepository) FindUserByIds(ids []int64) ([]user_entity.UserModel, error) {
+	m := []userGormModel{}
+	err := r.db.Table("users").Select("*").
+		Where("id in (?)", ids).
+		Find(&m).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = utils.DataNotFoundError
+		}
+
+		return []user_entity.UserModel{}, err
+	}
+
+	res := []user_entity.UserModel{}
+	for _, v := range m {
+		res = append(res, user_entity.UserModel{
+			ID:            v.ID,
+			Username:      v.Username,
+			Password:      v.Password,
+			Fullname:      v.Fullname,
+			Age:           v.Age,
+			Gender:        v.Gender,
+			IsPremiumUser: v.IsPremiumUser,
+		})
+	}
+	return res, nil
+}
+
 func (r UserRepository) CreateNewUser(entity *user_entity.UserModel) error {
 	m := userGormModel{
 		Username:      entity.Username,

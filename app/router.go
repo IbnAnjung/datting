@@ -5,6 +5,7 @@ import (
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
 	"github.com/IbnAnjung/datting/entity/user_entity"
+	"github.com/IbnAnjung/datting/entity/user_swap_entity"
 	"github.com/IbnAnjung/datting/handler/auth_handler"
 	"github.com/IbnAnjung/datting/handler/user_handler"
 	"github.com/IbnAnjung/datting/utils"
@@ -14,6 +15,7 @@ import (
 func LoadGinRouter(
 	auth auth_entity.AuthUseCase,
 	user user_entity.UserUseCase,
+	userSwap user_swap_entity.UserSwapUseCase,
 	jwt auth_entity.Jwt,
 ) *gin.Engine {
 	router := gin.Default()
@@ -31,10 +33,11 @@ func LoadGinRouter(
 		authH.POST("/login", authHandler.Login)
 	}
 
-	userHandler := user_handler.NewUserHandler(user)
+	userHandler := user_handler.NewUserHandler(user, userSwap)
 	userH := router.Group("/user").Use(AuthMiddleware())
 	{
-		userH.GET("/profile", userHandler.GerUserProfile)
+		userH.GET("/profile", userHandler.GetUserProfile)
+		userH.POST("/profile/swap", userHandler.SwapUserProfile)
 	}
 
 	return router

@@ -9,6 +9,7 @@ import (
 	"github.com/IbnAnjung/datting/repository/redis_repository"
 	authUC "github.com/IbnAnjung/datting/usecase/auth"
 	userUC "github.com/IbnAnjung/datting/usecase/user"
+	userSwapUC "github.com/IbnAnjung/datting/usecase/user_swap"
 	"github.com/IbnAnjung/datting/utils"
 )
 
@@ -57,6 +58,7 @@ func Start(ctx context.Context) (func(), error) {
 	// repository
 	userRepo := mysqlgorm.NewUserRepository(orm)
 	userCacheRepo := redis_repository.NewUserCacheRepository(cache)
+	userSwapRepo := mysqlgorm.NewUserSwapRepository(orm)
 
 	// validator
 	validator, err := utils.NewValidator()
@@ -77,12 +79,20 @@ func Start(ctx context.Context) (func(), error) {
 	)
 
 	userUC := userUC.New(
+		validator,
 		userRepo,
 		userCacheRepo,
 	)
 
+	userSwapUC := userSwapUC.New(
+		validator,
+		userRepo,
+		userCacheRepo,
+		userSwapRepo,
+	)
+
 	router := LoadGinRouter(
-		authUC, userUC, jwt,
+		authUC, userUC, userSwapUC, jwt,
 	)
 
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))
