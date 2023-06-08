@@ -8,8 +8,21 @@ import (
 	"github.com/IbnAnjung/datting/utils"
 )
 
+type loginInput struct {
+	Username string `json:"username" validate:"required,alphanumunicode,min=3,max=25"`
+	Password string `json:"password" validate:"required,min=5,max=50"`
+}
+
+func (i *loginInput) set(input auth_entity.LoginInput) {
+	i.Username = input.Username
+	i.Password = input.Password
+}
+
 func (u AuthUC) Login(ctx context.Context, input auth_entity.LoginInput) (output auth_entity.LoginOutput, err error) {
-	if err = u.validator.ValidateStruct(input); err != nil {
+	i := &loginInput{}
+	i.set(input)
+
+	if err = u.validator.ValidateStruct(i); err != nil {
 		return
 	}
 

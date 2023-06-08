@@ -9,8 +9,22 @@ import (
 	"github.com/IbnAnjung/datting/utils"
 )
 
+type swapUserProfileInput struct {
+	AuthUserID           int64                     `json:"auth_user_id" validate:"required,numeric,min=1"`
+	SwappedProfileUserID int64                     `json:"swapped_profile_user_id" validate:"required,numeric,min=1,nefield=AuthUserID"`
+	SwapType             user_swap_entity.SwapType `json:"swap_type" validate:"required,swap_type"`
+}
+
+func (i *swapUserProfileInput) set(input user_swap_entity.SwapUserProfileInput) {
+	i.AuthUserID = input.AuthUserID
+	i.SwappedProfileUserID = input.SwappedProfileUserID
+	i.SwapType = input.SwapType
+}
+
 func (uc UserSwapUC) SwapUserProfile(ctx context.Context, input user_swap_entity.SwapUserProfileInput) error {
-	if err := uc.validator.ValidateStruct(input); err != nil {
+	i := &swapUserProfileInput{}
+	i.set(input)
+	if err := uc.validator.ValidateStruct(i); err != nil {
 		return err
 	}
 
