@@ -1,7 +1,6 @@
 package auth_handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
@@ -23,19 +22,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 	})
 
 	if err != nil {
-		if err, ok := err.(utils.ValidationError); ok {
-			validationErrors := err.Validator.GetValidationErrors()
-			utils.ErrorValidationResponse(c, err.Error(), validationErrors)
-			return
-		}
-
-		if err, ok := err.(utils.ClientError); ok {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		fmt.Printf("user register failed %s", err.Error())
-		utils.ErrorResponse(c, http.StatusInternalServerError, "user register failed")
+		utils.GeneralErrorResponse(c, err, "Fail to login")
 		return
 	}
 

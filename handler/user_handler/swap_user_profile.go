@@ -1,7 +1,6 @@
 package user_handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
@@ -37,19 +36,7 @@ func (h UserHandler) SwapUserProfile(c *gin.Context) {
 	})
 
 	if err != nil {
-		var appErr utils.AppError
-		appErr = utils.ServerError{}
-
-		if e, ok := err.(utils.ClientError); ok {
-			appErr = e
-		} else if e, ok := err.(utils.ValidationError); ok {
-			validationErrors := e.Validator.GetValidationErrors()
-			utils.ErrorValidationResponse(c, err.Error(), validationErrors)
-			return
-		}
-
-		fmt.Printf("usecase swap user error %s", err.Error())
-		utils.ErrorResponse(c, appErr.ErrorCode(), appErr.Error())
+		utils.GeneralErrorResponse(c, err, "Fail to react profile")
 		return
 	}
 

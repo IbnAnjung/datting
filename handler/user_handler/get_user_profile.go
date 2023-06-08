@@ -1,7 +1,6 @@
 package user_handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
@@ -29,14 +28,7 @@ func (h UserHandler) GetUserProfile(c *gin.Context) {
 	})
 
 	if err != nil {
-		var appErr utils.AppError
-		appErr = utils.ServerError{}
-		if e, ok := err.(utils.ClientError); ok {
-			appErr = e
-		}
-
-		fmt.Printf("usecase detail user error %s", err.Error())
-		utils.ErrorResponse(c, appErr.ErrorCode(), appErr.Error())
+		utils.GeneralErrorResponse(c, err, "Fail to show profile")
 		return
 	}
 

@@ -1,7 +1,6 @@
 package auth_handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/IbnAnjung/datting/entity/auth_entity"
@@ -27,19 +26,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 	})
 
 	if err != nil {
-		if err, ok := err.(utils.ValidationError); ok {
-			validationErrors := err.Validator.GetValidationErrors()
-			utils.ErrorValidationResponse(c, err.Error(), validationErrors)
-			return
-		}
-
-		if err, ok := err.(utils.ClientError); ok {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		fmt.Printf("user register failed %s", err.Error())
-		utils.ErrorResponse(c, http.StatusInternalServerError, "user register failed")
+		utils.GeneralErrorResponse(c, err, "Fail to registering new user")
 		return
 	}
 
@@ -54,7 +41,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusCreated, "Success Register new User", dto.RegisterResponse{
+	utils.SuccessResponse(c, http.StatusCreated, "Success to registering new User", dto.RegisterResponse{
 		ID:       reg.ID,
 		Username: reg.Username,
 		FullName: reg.FullName,
