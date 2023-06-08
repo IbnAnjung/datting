@@ -25,6 +25,7 @@ type UserRepository interface {
 	FindUserByIds(ids []int64) ([]UserModel, error)
 	FindUser(gender string, excldeUserIds []int64) (UserModel, error)
 	CreateNewUser(*UserModel) error
+	UpdateUser(*UserModel) error
 }
 
 type UserUseCase interface {

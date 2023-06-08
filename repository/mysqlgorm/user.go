@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type userGormModel struct {
+type UserGormModel struct {
 	ID            int64  `gorm:"column:id;auto_generate;<-:create"`
 	Username      string `gorm:"column:username"`
 	Password      string `gorm:"column:password"`
@@ -16,6 +16,19 @@ type userGormModel struct {
 	Age           int    `gorm:"column:age"`
 	Gender        string `gorm:"column:gender"`
 	IsPremiumUser bool   `gorm:"column:is_premium"`
+}
+
+func (UserGormModel) TableName() string {
+	return "users"
+}
+
+func (m *UserGormModel) set(entity user_entity.UserModel) {
+	m.Username = entity.Username
+	m.Password = entity.Password
+	m.Fullname = entity.Fullname
+	m.Age = entity.Age
+	m.Gender = entity.Gender
+	m.IsPremiumUser = entity.IsPremiumUser
 }
 
 type UserRepository struct {
@@ -29,7 +42,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r UserRepository) FindUserByUsername(username string) (user_entity.UserModel, error) {
-	m := &userGormModel{}
+	m := &UserGormModel{}
 	err := r.db.Table("users").Select("*").
 		Where("username = ?", username).
 		Find(m).Error
@@ -50,7 +63,7 @@ func (r UserRepository) FindUserByUsername(username string) (user_entity.UserMod
 }
 
 func (r UserRepository) FindUserById(id int64) (user_entity.UserModel, error) {
-	m := &userGormModel{}
+	m := &UserGormModel{}
 	err := r.db.Table("users").Select("*").
 		Where("id = ?", id).
 		Find(m).Error
@@ -75,7 +88,7 @@ func (r UserRepository) FindUserById(id int64) (user_entity.UserModel, error) {
 }
 
 func (r UserRepository) FindUserByIds(ids []int64) ([]user_entity.UserModel, error) {
-	m := []userGormModel{}
+	m := []UserGormModel{}
 	err := r.db.Table("users").Select("*").
 		Where("id in (?)", ids).
 		Find(&m).Error
@@ -104,23 +117,24 @@ func (r UserRepository) FindUserByIds(ids []int64) ([]user_entity.UserModel, err
 }
 
 func (r UserRepository) CreateNewUser(entity *user_entity.UserModel) error {
-	m := userGormModel{
-		Username:      entity.Username,
-		Password:      entity.Password,
-		Fullname:      entity.Fullname,
-		Age:           entity.Age,
-		Gender:        entity.Gender,
-		IsPremiumUser: entity.IsPremiumUser,
-	}
+	m := &UserGormModel{}
+	m.set(*entity)
 
-	err := r.db.Table("users").Create(&m).Error
+	err := r.db.Create(&m).Error
 	entity.ID = m.ID
 
 	return err
 }
 
+func (r UserRepository) UpdateUser(entity *user_entity.UserModel) error {
+	m := &UserGormModel{}
+	m.set(*entity)
+
+	return r.db.Model(m).Updates(m).Error
+}
+
 func (r UserRepository) FindUser(gender string, excldeUserIds []int64) (user_entity.UserModel, error) {
-	m := &userGormModel{}
+	m := &UserGormModel{}
 	err := r.db.Table("users").Select("*").
 		Where("gender = ?", gender).
 		Not(map[string]interface{}{"id": excldeUserIds}).
