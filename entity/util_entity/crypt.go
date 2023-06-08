@@ -1,4 +1,4 @@
-package crypt_entity
+package util_entity
 
 type Crypt interface {
 	HashString(str string) (string, error)
