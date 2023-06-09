@@ -11,10 +11,7 @@ import (
 
 func (h AuthHandler) Register(c *gin.Context) {
 	var request dto.RegisterRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
-		utils.ErrorValidationResponse(c, err.Error(), []string{})
-		return
-	}
+	c.ShouldBindJSON(&request)
 
 	reg, err := h.authUC.Register(c, auth_entity.RegisterInput{
 		Username:        request.Username,

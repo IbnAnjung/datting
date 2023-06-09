@@ -9,7 +9,7 @@ import (
 )
 
 type loginInput struct {
-	Username string `json:"username" validate:"required,alphanumunicode,min=3,max=25"`
+	Username string `json:"username" validate:"required,ascii,min=3,max=25"`
 	Password string `json:"password" validate:"required,min=5,max=50"`
 }
 

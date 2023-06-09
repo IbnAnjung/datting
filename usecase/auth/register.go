@@ -9,9 +9,9 @@ import (
 )
 
 type registerInput struct {
-	Username        string `json:"username" validate:"required,alphanumunicode,min=3,max=25"`
+	Username        string `json:"username" validate:"required,min=3,max=25"`
 	Password        string `json:"password" validate:"required,min=5,max=50"`
-	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password,min=5,max=50"`
+	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
 	FullName        string `json:"fullname" validate:"required,min=5,max=100"`
 	Age             int    `json:"age" validate:"required,numeric,min=1,max=200"`
 	Gender          string `json:"gender" validate:"required,gender"`
@@ -41,7 +41,7 @@ func (u AuthUC) Register(ctx context.Context, input auth_entity.RegisterInput) (
 	}
 
 	if user.ID != 0 {
-		utils.DuplicatedDataError.Message = "username already Exists"
+		utils.DuplicatedDataError.Message = "username already exists"
 		err = utils.DuplicatedDataError
 		return
 	}

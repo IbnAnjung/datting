@@ -11,10 +11,7 @@ import (
 
 func (h AuthHandler) Login(c *gin.Context) {
 	var request dto.LoginRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
-		utils.ErrorValidationResponse(c, err.Error(), []string{})
-		return
-	}
+	c.ShouldBindJSON(&request)
 
 	login, err := h.authUC.Login(c, auth_entity.LoginInput{
 		Username: request.Username,
@@ -26,7 +23,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusOK, "Success Register new User", dto.LoginResponse{
+	utils.SuccessResponse(c, http.StatusOK, "Success Login", dto.LoginResponse{
 		ID:       login.ID,
 		Username: login.Username,
 		FullName: login.FullName,
