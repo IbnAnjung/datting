@@ -49,6 +49,10 @@ func (r UserRepository) FindUserByUsername(username string) (user_entity.UserMod
 		Find(m).Error
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = utils.DataNotFoundError
+		}
+
 		return user_entity.UserModel{}, err
 	}
 

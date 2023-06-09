@@ -46,7 +46,7 @@ func GeneralErrorResponse(c *gin.Context, err error, message string) {
 		return
 	}
 
-	if err, ok := err.(ClientError); ok {
+	if err, ok := err.(*ClientError); ok {
 		ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}

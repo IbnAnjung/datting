@@ -9,7 +9,7 @@ import (
 )
 
 type registerInput struct {
-	Username        string `json:"username" validate:"required,min=3,max=25"`
+	Username        string `json:"username" validate:"required,ascii,min=3,max=25"`
 	Password        string `json:"password" validate:"required,min=5,max=50"`
 	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
 	FullName        string `json:"fullname" validate:"required,min=5,max=100"`

@@ -29,13 +29,12 @@ func (u AuthUC) Login(ctx context.Context, input auth_entity.LoginInput) (output
 	// find username exists or not
 	user, err := u.userRepository.FindUserByUsername(input.Username)
 	if err != nil {
-		return
-	}
+		if errors.Is(err, utils.DataNotFoundError) {
+			e := utils.DataNotFoundError
+			e.Message = "unmatch username and password"
+			err = e
+		}
 
-	if user.ID == 0 {
-		e := utils.DataNotFoundError
-		e.Message = "unmatch username and password"
-		err = e
 		return
 	}
 
