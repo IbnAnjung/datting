@@ -19,6 +19,7 @@ const (
 	FEMALE Gender = "P"
 )
 
+//go:generate mockery --name UserRepository
 type UserRepository interface {
 	FindUserByUsername(username string) (UserModel, error)
 	FindUserById(id int64) (UserModel, error)
@@ -28,6 +29,7 @@ type UserRepository interface {
 	UpdateUser(*UserModel) error
 }
 
+//go:generate mockery --name UserUseCase
 type UserUseCase interface {
 	GetRandomUserProfile(ctx context.Context, input DetailUserInput) (DetailUserOutput, error)
 }
@@ -37,6 +39,7 @@ const (
 	DAILY_USER_SWAP_PROFILES string = "daily_user_swap_profiles:"
 )
 
+//go:generate mockery --name UserCacheRepository
 type UserCacheRepository interface {
 	SetDailyUserViewProfile(ctx context.Context, userID, viewedUserId int64) error
 	GetDailyUserViewProfile(ctx context.Context, userID int64) ([]int64, error)
