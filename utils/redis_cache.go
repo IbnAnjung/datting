@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/IbnAnjung/datting/entity/util_entity"
@@ -16,6 +17,8 @@ type RedisCaching struct {
 	commands map[int][]interface{}
 }
 
+var mutex = sync.Mutex{}
+
 func NewRedisCaching(
 	conn *redis.Client,
 ) RedisCaching {
@@ -27,27 +30,31 @@ func NewRedisCaching(
 
 func (r RedisCaching) Set(key string, value interface{}) util_entity.Caching {
 	r.key = key
+	mutex.Lock()
 	r.commands[0] = []interface{}{"SET", key, value}
-
+	mutex.Unlock()
 	return r
 }
 
 func (r RedisCaching) PushList(key string, value interface{}) util_entity.Caching {
 	r.key = key
+	mutex.Lock()
 	r.commands[0] = []interface{}{"LPUSH", key, value}
-
+	mutex.Unlock()
 	return r
 }
 
 func (r RedisCaching) Expire(duration time.Duration) util_entity.Caching {
+	mutex.Lock()
 	r.commands[1] = []interface{}{"EXPIRE", r.key, duration}
-
+	mutex.Unlock()
 	return r
 }
 
 func (r RedisCaching) ExpireAt(t time.Time) util_entity.Caching {
+	mutex.Lock()
 	r.commands[1] = []interface{}{"EXPIREAT", r.key, t.Unix()}
-
+	mutex.Unlock()
 	return r
 }
 
