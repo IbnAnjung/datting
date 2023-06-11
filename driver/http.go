@@ -26,6 +26,8 @@ func RunGinHttpServer(ctx context.Context, router *gin.Engine, config httpConfig
 	}
 
 	go func() {
+		log.Printf("Run service with %s mode", gin.Mode())
+
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Printf("listen: %s\n", err)
 		}

@@ -20,7 +20,13 @@ func LoadGinRouter(
 	userSwap user_swap_entity.UserSwapUseCase,
 	account account_entity.AccountUseCase,
 	jwt auth_entity.Jwt,
+	config Config,
 ) *gin.Engine {
+
+	if config.App.Mode == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 
 	//healt

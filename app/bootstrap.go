@@ -79,7 +79,7 @@ func Start(ctx context.Context) (func(), error) {
 	accountUC := accountUC.New(userRepo)
 
 	router := LoadGinRouter(
-		authUC, userUC, userSwapUC, accountUC, jwt,
+		authUC, userUC, userSwapUC, accountUC, jwt, *conf,
 	)
 
 	httpCleanup, err := driver.RunGinHttpServer(ctx, router, driver.LoadHttpConfig(conf.Http.Port))

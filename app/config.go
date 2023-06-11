@@ -11,6 +11,7 @@ import (
 
 type AppConfig struct {
 	Name string
+	Mode string
 }
 
 type JwtConfig struct {
@@ -80,6 +81,7 @@ func LoadConfig() (*Config, error) {
 	return &Config{
 		App: AppConfig{
 			Name: os.Getenv("APP_NAME"),
+			Mode: os.Getenv("APP_MODE"),
 		},
 		Http:  httpConfig,
 		Mysql: mysqlConfig,
