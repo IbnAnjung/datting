@@ -50,7 +50,7 @@ func Start(ctx context.Context) (func(), error) {
 
 	cache := utils.NewRedisCaching(redisConn)
 
-	orm, err := driver.NewGormOrm("mysql", dbconn)
+	orm, err := utils.NewGormOrm("mysql", dbconn)
 	if err != nil {
 		return func() {
 			mysqlCleanup()

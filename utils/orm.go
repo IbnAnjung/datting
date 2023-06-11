@@ -1,4 +1,4 @@
-package driver
+package utils
 
 import (
 	"database/sql"
